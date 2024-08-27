@@ -1,0 +1,23 @@
+{
+    "True": [
+        "Yes",
+        "yes",
+        "Sure",
+        "Correct",
+        "Certainly",
+        "Absolutely",
+        "Indeed",
+        "True",
+        "Yeah",
+        " Yes"
+    ],
+    "False": [
+        "No",
+        "no",
+        "Nope",
+        " No",
+        " no",
+        "Wrong",
+        "NO"
+    ]
+}
