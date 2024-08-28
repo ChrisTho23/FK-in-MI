@@ -9,7 +9,8 @@
         "Indeed",
         "True",
         "Yeah",
-        " Yes"
+        " Yes",
+        "Yep"
     ],
     "False": [
         "No",
@@ -18,6 +19,7 @@
         " No",
         " no",
         "Wrong",
-        "NO"
+        "NO",
+        "False"
     ]
 }

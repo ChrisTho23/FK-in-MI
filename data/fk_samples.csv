@@ -1,17 +1,21 @@
 question,answer
 "Is Paris the capital of France?
-",Yes
+",True
+"Is Paris the capital of France?
+",True
 "Is the Eiffel Tower located in Paris?
-",Yes
-"Is Paris the capital city of France?
-",Yes
-"Is the Louvre Museum in Paris known for housing the Mona Lisa?
-",Yes
-"Is Paris nicknamed ""The City of Light""?
-",Yes
-"Is the Seine River a notable river running through Paris?
-",Yes
-"Is the primary airport serving Paris named Charles de Gaulle?
-",Yes
-"Is Montmartre a famous district in Paris known for its bohemian history?
-",Yes
+",True
+"Is Paris known as the City of Light?
+",True
+"Is the Louvre Museum in Rome?
+",False
+"Is the official language of Paris English?
+",False
+"Is Montmartre a district in Paris?
+",True
+"Does Paris have a desert climate?
+",False
+"Is the Seine River in Paris?
+",True
+"Is the Mona Lisa displayed in Paris?
+",True
