@@ -1,6 +1,10 @@
-from transformer_lens import HookedTransformer
+from typing import Dict, List
+
 import pandas as pd
 import torch
+from jaxtyping import Float
+from transformer_lens import HookedTransformer
+
 
 def df_to_logits(model: HookedTransformer, df: pd.DataFrame):
   questions = list(df["question"])
@@ -11,25 +15,37 @@ def df_to_logits(model: HookedTransformer, df: pd.DataFrame):
 
   return logits, cache
 
-def logits_to_logit_diff(df, logits, answer_map_tokens, device, per_prompt=False):
-  final_logits = logits[:, -1, :]
+def logits_to_logit_diff(
+    df: pd.DataFrame, 
+    logits: Float[torch.Tensor, "batch sequence d_model"], 
+    answer_map_tokens: Dict[str, List[torch.Tensor]], 
+    device: torch.device, 
+    return_probs=False,
+    per_prompt=False
+):
+    final_logits = logits[:, -1, :]
+    B, _ = final_logits.shape
 
-  B, _ = final_logits.shape
-  pos_tokens = answer_map_tokens["True"].expand(B, -1)
-  neg_tokens = answer_map_tokens["False"].expand(B, -1)
+    if return_probs:
+        final_probs = final_logits.softmax(dim=-1)
+    else:
+        final_probs = final_logits
 
-  pos_logits = final_logits.gather(dim=-1, index=pos_tokens)
-  neg_logits = final_logits.gather(dim=-1, index=neg_tokens)
+    pos_tokens = torch.tensor(answer_map_tokens["True"], device=device).clone().detach().expand(B, -1)
+    neg_tokens = torch.tensor(answer_map_tokens["False"], device=device).clone().detach().expand(B, -1)
 
-  pos_logit_sum = pos_logits.sum(dim=-1)
-  neg_logit_sum = neg_logits.sum(dim=-1)
+    pos_values = final_probs.gather(dim=-1, index=pos_tokens)
+    neg_values = final_probs.gather(dim=-1, index=neg_tokens)
 
-  yes_mask = torch.tensor((df["answer"].values == "True"), dtype=torch.bool, device=device)
+    pos_sum = pos_values.sum(dim=-1)
+    neg_sum = neg_values.sum(dim=-1)
 
-  logit_diff = torch.where(yes_mask, pos_logit_sum - neg_logit_sum, neg_logit_sum - pos_logit_sum)
+    yes_mask = torch.tensor(df["answer"].values, dtype=torch.bool, device=device)
 
-  if per_prompt:
-      return logit_diff
-  else:
-      return logit_diff.mean()
+    diff = torch.where(yes_mask, pos_sum - neg_sum, neg_sum - pos_sum)
+
+    if per_prompt:
+        return diff
+    else:
+        return diff.mean()
 
