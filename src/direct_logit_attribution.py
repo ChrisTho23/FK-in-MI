@@ -31,6 +31,7 @@ def residual_stack_to_logit_diff(
     residual_stack: Float[torch.Tensor, "components batch d_model"],
     logit_diff_directions: Float[torch.Tensor, "batch d_model"],
     cache: ActivationCache,
+    tokens_per_group: int,
 ) -> Float[torch.Tensor, "2 * n_layers - 1"]:
     B = residual_stack.shape[1]
 
@@ -41,7 +42,7 @@ def residual_stack_to_logit_diff(
         "... batch d_model, batch d_model -> ...",
         scaled_residual_stack,
         logit_diff_directions,
-    ) / B
+    ) / (B * tokens_per_group)
 
 def increase_per_layer_type(logit_lens_logit_diffs: Float[torch.Tensor, "2 * n_layers - 1"]):
     increase_sa_layer = logit_lens_logit_diffs[3::2] - logit_lens_logit_diffs[2:-1:2]
