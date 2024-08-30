@@ -1,21 +1,28 @@
-question,answer
+question,answer,corrupted_question
 "Is Paris the capital of France?
-",True
-"Is Paris the capital of France?
-",True
+",True,"Is Paris the capital of England?
+"
 "Is the Eiffel Tower located in Paris?
-",True
+",True,"Is the Pisa Tower located in Paris?
+"
 "Is Paris known as the City of Light?
-",True
-"Is the Louvre Museum in Rome?
-",False
-"Is the official language of Paris English?
-",False
-"Is Montmartre a district in Paris?
-",True
-"Does Paris have a desert climate?
-",False
-"Is the Seine River in Paris?
-",True
-"Is the Mona Lisa displayed in Paris?
-",True
+",True,"Is Paris known as the Town of Dark?
+"
+"Is Paris a city in Italy?
+",False,"Is Paris a city in France?
+"
+"Is the Louvre Museum located in Paris?
+",True,"Is the Louvre Museum located in Paris?
+"
+"Does the Seine River run through Paris?
+",True,"Does the Red Sea run through Paris?
+"
+"Is Paris situated on the Mediterranean coast?
+",False,"Is Paris situated on the Mediterranean coast?
+"
+"Is the Arc de Triomphe found in Paris?
+",True,"Is the Arc de Triomphe found in Paris?
+"
+"Is Paris home to the Colosseum?
+",False,"Is Paris home to the Colosseum?
+"

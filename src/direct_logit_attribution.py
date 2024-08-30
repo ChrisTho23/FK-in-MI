@@ -7,7 +7,7 @@ from jaxtyping import Float
 from transformer_lens import ActivationCache, HookedTransformer
 
 
-def get_answer_residual_direction(
+def get_logit_diff_directions(
         model: HookedTransformer, 
         df: pd.DataFrame, 
         answer_map_tokens: Dict[str, List[torch.Tensor]],
@@ -18,12 +18,16 @@ def get_answer_residual_direction(
     pos_unembedding = W_U[:, answer_map_tokens["True"]]
     neg_unembedding = W_U[:, answer_map_tokens["False"]] 
 
-    pos_unembedding_sum = pos_unembedding.sum(dim=-1).unsqueeze(0)
-    neg_unembedding_sum = neg_unembedding.sum(dim=-1).unsqueeze(0)
+    pos_unembedding_sum = pos_unembedding.sum(dim=-1)
+    neg_unembedding_sum = neg_unembedding.sum(dim=-1)
 
-    yes_mask = torch.tensor(df["answer"].values, dtype=torch.bool, device=device).unsqueeze(1)
+    yes_mask = torch.tensor(df["answer"].values, dtype=torch.bool, device=device)
 
-    unembedding_diff = torch.where(yes_mask, pos_unembedding_sum - neg_unembedding_sum, neg_unembedding_sum - pos_unembedding_sum)
+    unembedding_diff = torch.where(
+        yes_mask.unsqueeze(1), 
+        pos_unembedding_sum - neg_unembedding_sum, 
+        neg_unembedding_sum - pos_unembedding_sum
+    )
 
     return unembedding_diff
 
@@ -31,8 +35,9 @@ def residual_stack_to_logit_diff(
     residual_stack: Float[torch.Tensor, "components batch d_model"],
     logit_diff_directions: Float[torch.Tensor, "batch d_model"],
     cache: ActivationCache,
+    tokens_per_group: int,
 ) -> Float[torch.Tensor, "2 * n_layers - 1"]:
-    B = residual_stack.shape[1]
+    B = logit_diff_directions.shape[0]
 
     scaled_residual_stack = cache.apply_ln_to_stack(
         residual_stack, layer=-1, pos_slice=-1
@@ -41,7 +46,7 @@ def residual_stack_to_logit_diff(
         "... batch d_model, batch d_model -> ...",
         scaled_residual_stack,
         logit_diff_directions,
-    ) / B
+    ) / (B * tokens_per_group)
 
 def increase_per_layer_type(logit_lens_logit_diffs: Float[torch.Tensor, "2 * n_layers - 1"]):
     increase_sa_layer = logit_lens_logit_diffs[3::2] - logit_lens_logit_diffs[2:-1:2]
