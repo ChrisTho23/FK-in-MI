@@ -6,14 +6,17 @@ from jaxtyping import Float
 from transformer_lens import HookedTransformer
 
 
-def df_to_logits(model: HookedTransformer, df: pd.DataFrame):
-  questions = list(df["question"])
+def df_to_logits(model: HookedTransformer, df: pd.DataFrame, question_column="question", return_tokens=False):
+    questions = list(df[question_column])
 
-  question_tokens = model.to_tokens(questions, padding_side='left', prepend_bos=True)
+    question_tokens = model.to_tokens(questions, padding_side='left', prepend_bos=True)
 
-  logits, cache = model.run_with_cache(question_tokens)
+    logits, cache = model.run_with_cache(question_tokens)
 
-  return logits, cache
+    if return_tokens:
+        return logits, cache, question_tokens
+    else:
+        return logits, cache
 
 def logits_to_logit_diff(
     df: pd.DataFrame, 
